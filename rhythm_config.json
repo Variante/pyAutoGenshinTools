@@ -1,22 +1,9 @@
 {
-    "data": [
-    {
-        "key": "A"
-    },
-    {
-        "key": "S"
-    },
-    {
-        "key": "D"
-    },
-    {
-        "key": "J"
-    },
-    {
-        "key": "K"
-    },
-    {
-        "key": "L"
-    }
-]
+    "match_width": 1280,
+    "match_height": 720,
+    "thre": 0.7,
+    "single_press": 0.3,
+    "n_track": 6,
+    "crop": [0.16, 0.6, 0.84, 0.90],
+    "key": "asdjkl"
 }

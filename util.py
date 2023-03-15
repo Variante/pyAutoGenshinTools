@@ -10,7 +10,7 @@ def load_cfg(fn='./config.json'):
         return cfg
 
 
-def get_possible_window_name(name="明日方舟"):
+def get_possible_window_name(name="原神"):
     print("Search for the window whose name contains", name)
     possible_hwnd = None
     def winEnumHandler(hwnd, ctx):
