@@ -1,4 +1,3 @@
-
 # -*- coding:utf-8 -*-
 import mss
 from util import *
@@ -10,7 +9,10 @@ import cv2
 from datetime import datetime
 
 
-def main(cfg):
+def mainloop(title='', callback=None):
+    print("操作说明:\nS:保存当前截图\nR:重新检测窗口位置\nQ:退出\n" + '-'*8)
+    
+    cfg = load_cfg()
     # Windows
     root = Tk()
     # Create a frame
@@ -23,7 +25,7 @@ def main(cfg):
     ldtag1 = Label(app, font=tkFont.Font(size=15, weight=tkFont.BOLD))
     ldtag1.pack()
     
-    root.title('AutoGenshin-Template')
+    root.title('AutoGenshin' + title)
     # root.geometry('1300x760')
     target_name = cfg['name']
     scale = cfg['scale']
@@ -70,9 +72,14 @@ def main(cfg):
                 full_win = get_window_roi(target_name,[0, 0, 1, 1], [0, 0, 0, 0])
                 if len(cfg['stick']) == 2:
                     root.geometry(f"+{get_stick(cfg['stick'][0], full_win)}+{get_stick(cfg['stick'][1], full_win)}")
-                img = np.array(m.grab(win_info))
-                
+                img = np.array(m.grab(win_info))    
                 img_c = img.copy()
+                
+                if callback is not None:
+                    text = callback(img)
+                    if text is not None:
+                        ldtag1.configure(text=text)
+                    
                 pil_img = Image.fromarray(img[:, :, :3][:, :, ::-1])
                 if scale > 0:
                     pil_img = pil_img.resize((int(pil_img.size[0] * scale), int(pil_img.size[1] * scale)))
@@ -96,11 +103,5 @@ def main(cfg):
         capture_stream()
         root.mainloop()
 
-def usage():
-    print("操作说明:\nS:保存当前截图\nR:重新检测窗口位置\nQ:退出\n" + '-'*8)
-
-
 if __name__ == '__main__':
-    usage()
-    cfg = load_cfg()
-    main(cfg)
+    mainloop()

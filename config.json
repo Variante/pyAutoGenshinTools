@@ -4,10 +4,7 @@
     "padding": [30, 5, 5, 5],
     "scale": 0.4,
 	"match_width": 1024,
-    "stick": ["left", "top,height"],
+    "stick": ["left,width", "top"],
     "display_fps": 60,
-    "always_update_window": false,
-    "data": [
-    ]
+    "always_update_window": false
 }
-

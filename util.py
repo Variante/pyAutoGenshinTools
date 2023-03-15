@@ -3,8 +3,8 @@ import json
 import win32gui
 
 
-def load_cfg():
-    with open('./config.json', 'r', encoding="utf-8") as f:
+def load_cfg(fn='./config.json'):
+    with open(fn, 'r', encoding="utf-8") as f:
         content = f.read()
         cfg = json.loads(content)
         return cfg
