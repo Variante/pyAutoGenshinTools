@@ -1,0 +1,13 @@
+{
+    "name": "原神",
+    "comment": "name是窗口名称，如果没有准确匹配的名称会搜索包含的name的窗口。padding是计算比例之前扣除的像素数量，形式top,bottom,left,right。stick是自动贴合主窗口，设置为空队列即不贴合。",
+    "padding": [30, 5, 5, 5],
+    "scale": 0.4,
+	"match_width": 1024,
+    "stick": ["left", "top,height"],
+    "display_fps": 60,
+    "always_update_window": false,
+    "data": [
+    ]
+}
+
