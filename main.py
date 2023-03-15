@@ -73,7 +73,7 @@ def mainloop(title='', callback=None):
                 if len(cfg['stick']) == 2:
                     root.geometry(f"+{get_stick(cfg['stick'][0], full_win)}+{get_stick(cfg['stick'][1], full_win)}")
                 img = np.array(m.grab(win_info))    
-                img_c = img.copy()
+                img_c = img[:, :, :3].copy()
                 
                 if callback is not None:
                     text = callback(img)
@@ -88,9 +88,9 @@ def mainloop(title='', callback=None):
                     lmain.configure(image=imgtk)
                         
                 if save_img:
-                    now = datetime.now()
-                    date_time = now.strftime("./%H-%M-%S")
-                    cv2.imwrite(date_time + ".png", img_c)
+                    p = f'{datetime.now():%Y-%m-%d_%H-%M-%S}.png'
+                    if cv2.imwrite(p, img_c):
+                        print('Save to ', p)
                     save_img = False
                 
                     
