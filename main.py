@@ -56,8 +56,8 @@ def mainloop(title='', callback=None):
 
     root.bind('<KeyPress>', onKeyPress)
     
-    display_interval = int(1000 / cfg['display_fps'])
-
+    # display_interval = int(1000 / cfg['display_fps'])
+    display_interval = 5
     with mss.mss() as m:
         def capture_stream():
             nonlocal save_img
