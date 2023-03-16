@@ -1,7 +1,7 @@
 {
     "match_width": 640,
     "match_height": 720,
-    "thre": 0.8,
+    "thre": 0.75,
     "speed": 36,
     "n_track": 6,
     "crop": [0.165, 0.15, 0.835, 0.85],

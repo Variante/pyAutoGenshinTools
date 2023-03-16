@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 def mainloop(title='', callback=None):
-    print("操作说明:\nS:保存当前截图\nR:重新检测窗口位置\nQ:退出\n" + '-'*8)
+    print("操作说明:\nW:保存当前截图\nR:重新检测窗口位置\nQ:退出\n" + '-'*8)
     
     cfg = load_cfg()
     # Windows
@@ -39,7 +39,7 @@ def mainloop(title='', callback=None):
         nonlocal win_info
         if event.keysym in 'qQ':
             root.quit()
-        elif event.keysym in 'sS':
+        elif event.keysym in 'wW':
             save_img = True
         elif event.keysym in 'rR':
             win_info = None

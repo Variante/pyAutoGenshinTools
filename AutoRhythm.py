@@ -18,9 +18,11 @@ class AutoRhythm:
         self.thre = self.cfg['thre']
         self.pkey = self.cfg['key']
         self.speed = self.cfg['speed']
+        self.add_speed = 0
         self.t_long = cv2.resize(cv2.imread('./img/t1.png')[..., self.chn], (20, 40))
         self.t_single = cv2.resize(cv2.imread('./img/t2.png')[..., self.chn], (20, 40))
         self.last = [None] * self.n_track
+        self.last2 = [None] * self.n_track
         self.down = [False] * self.n_track
         self.pred = [None] * self.n_track
         self.run = True
@@ -75,12 +77,13 @@ class AutoRhythm:
     def merge_single_long(self, long, single, idx):
         w = len(long)
         res = np.zeros(w, dtype=np.uint8)
+        speed = self.speed + self.add_speed
         if self.last[idx] is not None:
-            res[self.speed:] = self.last[idx][:-self.speed]
-            res[:self.speed] = self.last[idx][0]
+            res[speed:] = self.last[idx][:-speed]
+            res[:speed] = self.last[idx][0]
         # press
-        start = self.speed * 3
-        enable = long[start + 1] > self.thre
+        start = int(self.speed * 1.5)
+        enable = long[start + 1] > self.thre 
         for i in range(start, -1, -1):
             if long[i] > self.thre:
                 enable = True
@@ -89,6 +92,7 @@ class AutoRhythm:
                     # falling edge
                     enable = False
                     res[i] = 255 - res[i + 1]
+                    # res[i: enable + 1] = res[i]
                     continue
             res[i] = res[i + 1]
         # self.down[idx] = res[w - self.speed] > 0
@@ -111,24 +115,54 @@ class AutoRhythm:
                                   self.crop)
         
         longs, singles =self.split_match(r_img)
-        
+        adds = []
+        offset = [0] * self.n_track
+        for i in range(self.n_track):
+            l = longs[i] > self.thre
+            m = self.last[i]
+            if m is None:
+                continue
+            l_idx = 0
+            m_idx = 0
+            for t in range(1, 200):
+                if l[self.speed + t + 1] and not l[self.speed + t] and l_idx == 0:
+                    l_idx = t
+                if m[t + 1] != m[t] and m_idx == 0:
+                    m_idx = t
+                if l_idx > 0 and m_idx > 0:
+                    break
+            d = l_idx - m_idx
+            offset[i] = d
+            if d > 0 and d < 20:
+                adds.append(d)
+        if len(adds):
+            self.add_speed = int(sum(adds) / len(adds))
+        else:
+            self.add_speed = 0
+        h = len(longs[0])
+        w = 15
+        hs = int(self.crop[1] * self.cfg['match_height']) + 40
+        ws = 250
+        wh = 141
+        img[hs + int(self.speed * 1.5)] = 255
         t = 0
         for l, s in zip(longs, singles):
             res = self.merge_single_long(l, s, t)
             self.pred[t] = res.copy()
-            h = len(longs[0])
-            w = 15
-            hs = int(self.crop[1] * self.cfg['match_height']) + 40
-            ws = 250
-            wh = 141
-            for i in range(3):
-                img[hs: hs + h, ws + wh*t: ws + wh*t + w, i] = res.reshape(-1, 1).repeat(w, 1)
-                img[hs: hs + h, ws + wh*t - w: ws + wh*t, i] = ((l > self.thre).astype(np.uint8)  * 255).reshape(-1, 1).repeat(w, 1)
-            t += 1
             
+            for i in range(2):
+                img[hs: hs + h, ws + wh*t: ws + wh*t + w, i] = res.reshape(-1, 1).repeat(w, 1)
+                if self.last2[t] is not None:
+                    img[hs + self.speed: hs + h + self.speed, ws + wh*t + w: ws + wh*t + w*2, i] = self.last2[t].reshape(-1, 1).repeat(w, 1)
+                img[hs: hs + h, ws + wh*t - w: ws + wh*t, i] = ((l > self.thre).astype(np.uint8)  * 255).reshape(-1, 1).repeat(w, 1)
+            
+            self.last2[t] = res.copy()
+            t += 1
+        
         self.new_cmd.set()
         # return 'AutoRhythm is running'
-        return ' '.join(['down' if i else 'up' for i in self.down])
+        return ' '.join([str(i) for i in offset])
+        # return ' '.join(['down' if i else 'up' for i in self.down])
         # return ','.join([f'{i:.2f}({j:.2f})' for i, j in zip(vloc_long, vmax_long)])
         # return ','.join([f'{np.max(i):.2f}({np.max(j):.2f})' for i, j in zip(longs, singles)])
 
